@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confished — A Cautionary Tale About Maciej Igor Setniewski</title>
+  <meta name="description" content="A personal account of being conned and catfished by Maciej Igor Setniewski in Hong Kong. A 16,000 word cautionary tale." />
+  <meta name="keywords" content="Maciej Setniewski, Maciej Igor Setniewski, catfished, conned, Hong Kong, cautionary tale, sociopath" />
+  <meta property="og:title" content="Confished — A Cautionary Tale" />
+  <meta property="og:description" content="A personal account of being conned and catfished by Maciej Igor Setniewski in Hong Kong." />
+  <script>
+    // Redirect mobile/tablet users to the mobile-friendly page
+    if (window.innerWidth < 768 || /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+      window.location.href = 'mobile.html';
+    }
+  </script>
+  <style>
+    /* --- RESET & FULLSCREEN --- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #0a0a0a;
+      font-family: 'Helvetica Neue', sans-serif;
+    }
+
+    /* --- BACKGROUND --- */
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-image: url('assets/maciej-igor-setniewski.gif');
+      z-index: 0;
+    }
+
+    /* --- HEYZINE IFRAME --- */
+    #heyzine-wrapper {
+      position: absolute;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 70%;
+      max-width: 1100px;
+      height: 80%;
+      max-height: 900px;
+      z-index: 1;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+      border-radius: 12px;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    #heyzine-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: transparent;
+    }
+
+    /* --- iSlave PLAYER (no background, top-right) --- */
+    #audio-player {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;  /* align icons to the right */
+      gap: 2px;
+    }
+
+    /* --- Listen button --- */
+    #listen-btn {
+      max-width: 160px;
+      max-height: 48px;
+      width: auto;
+      height: auto;
+      cursor: pointer;
+      display: block;
+      object-fit: contain;
+    }
+
+    /* --- Control row (hidden initially) --- */
+    #control-row {
+      display: none;
+      flex-direction: row;
+      align-items: center;
+      gap: 0px;
+    }
+
+    #play-btn {
+      width: 48px;
+      height: 48px;
+      cursor: pointer;
+      object-fit: contain;
+      background: none;
+      border: none;
+      padding: 0;
+      transition: opacity 0.2s;
+    }
+
+    #play-btn.dimmed {
+      opacity: 0.4;
+    }
+
+    #volume-btn {
+      width: 43.5px;
+      height: 48px;
+      cursor: pointer;
+      object-fit: contain;
+      background: none;
+      border: none;
+      padding: 0;
+      transition: opacity 0.2s;
+    }
+
+    #volume-btn.dimmed {
+      opacity: 0.4;
+    }
+
+    /* --- Progress bar --- */
+    #progress-container {
+      width: 100%;
+      height: 7px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    #progress-bar {
+      width: 0%;
+      height: 100%;
+      background: #2eb912;
+      border-radius: 2px;
+      transition: width 0.3s linear;
+    }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 768px) {
+      #heyzine-wrapper {
+        width: 92%;
+        height: 80%;
+      }
+      #audio-player {
+        top: 10px;
+        right: 10px;
+      }
+      #listen-btn {
+        max-width: 110px;
+        max-height: 60px;
+      }
+      #play-btn {
+        width: 40px;
+        height: 40px;
+      }
+      #volume-btn {
+        width: 35px;
+        height: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="bg-canvas"></div>
+
+  <div id="heyzine-wrapper">
+    <!-- REPLACE with your own Heyzine URL -->
+    <iframe
+      src="https://heyzine.com/flip-book/79e8de0182.html?page=2"
+      allowfullscreen
+    ></iframe>
+  </div>
+
+  <div id="audio-player">
+    <!-- Listen button -->
+    <img id="listen-btn" src="assets/listen.png" alt="Listen to this article" />
+
+    <!-- Controls (hidden initially) -->
+    <div id="control-row">
+      <img id="play-btn" src="assets/Play.png" alt="Play" title="Play / Pause" />
+      <img id="volume-btn" src="assets/Volume-high.png" alt="Volume" title="Volume: High" />
+    </div>
+
+    <!-- Progress bar -->
+    <div id="progress-container">
+      <div id="progress-bar"></div>
+    </div>
+  </div>
+
+  <script>
+    // ------------------------------------------------------------
+    //  SINGLE AUDIO FILE (NO CHAPTERS)
+    // ------------------------------------------------------------
+    const AUDIO_FILE = 'assets/all.opus';   // <-- your single audio file
+
+    const VOLUME_STAGES = [
+      { src: 'assets/Volume-mute.png', level: 0, title: 'Volume: Mute' },
+      { src: 'assets/Volume-low.png', level: 0.25, title: 'Volume: Low' },
+      { src: 'assets/Volume-mid.png', level: 0.5, title: 'Volume: Mid' },
+      { src: 'assets/Volume-high.png', level: 0.75, title: 'Volume: High' },
+      { src: 'assets/Volume-loud.png', level: 1.0, title: 'Volume: Max' }
+    ];
+
+    // ------------------------------------------------------------
+    //  DOM REFS
+    // ------------------------------------------------------------
+    const listenBtn = document.getElementById('listen-btn');
+    const controlRow = document.getElementById('control-row');
+    const playBtn = document.getElementById('play-btn');
+    const volumeBtn = document.getElementById('volume-btn');
+    const progressBar = document.getElementById('progress-bar');
+
+    // ------------------------------------------------------------
+    //  AUDIO
+    // ------------------------------------------------------------
+    const audio = new Audio(AUDIO_FILE);
+    audio.loop = false;
+    audio.volume = 0.75;
+    audio.preload = 'metadata';
+
+    let isPlaying = false;
+    let controlsVisible = false;
+    let currentVolumeStage = 3; // start at High
+
+    // ------------------------------------------------------------
+    //  VOLUME
+    // ------------------------------------------------------------
+    function updateVolumeIcon() {
+      const stage = VOLUME_STAGES[currentVolumeStage];
+      volumeBtn.src = stage.src;
+      volumeBtn.title = stage.title;
+      audio.volume = stage.level;
+    }
+
+    // ------------------------------------------------------------
+    //  PROGRESS
+    // ------------------------------------------------------------
+    function updateProgress() {
+      if (audio.duration) {
+        const pct = (audio.currentTime / audio.duration) * 100;
+        progressBar.style.width = pct + '%';
+      }
+    }
+
+    // ------------------------------------------------------------
+    //  SHOW CONTROLS
+    // ------------------------------------------------------------
+    function showControls() {
+      if (controlsVisible) return;
+      controlsVisible = true;
+      listenBtn.style.display = 'none';
+      controlRow.style.display = 'flex';
+
+      // Auto‑play after a moment
+      setTimeout(() => {
+        audio.play()
+          .then(() => {
+            isPlaying = true;
+            playBtn.src = 'assets/Pause.png';
+          })
+          .catch(() => {});
+      }, 300);
+    }
+
+    // ------------------------------------------------------------
+    //  PLAY / PAUSE
+    // ------------------------------------------------------------
+    playBtn.addEventListener('click', function () {
+      if (audio.paused) {
+        audio.play()
+          .then(() => {
+            isPlaying = true;
+            playBtn.src = 'assets/Pause.png';
+          })
+          .catch(() => {});
+      } else {
+        audio.pause();
+        isPlaying = false;
+        playBtn.src = 'assets/Play.png';
+      }
+    });
+
+    // ------------------------------------------------------------
+    //  VOLUME CYCLE
+    // ------------------------------------------------------------
+    volumeBtn.addEventListener('click', function () {
+      currentVolumeStage = (currentVolumeStage + 1) % VOLUME_STAGES.length;
+      updateVolumeIcon();
+    });
+
+    // ------------------------------------------------------------
+    //  PROGRESS EVENTS
+    // ------------------------------------------------------------
+    audio.addEventListener('timeupdate', updateProgress);
+    audio.addEventListener('loadedmetadata', function () {
+      progressBar.style.width = '0%';
+    });
+    audio.addEventListener('ended', function () {
+      isPlaying = false;
+      playBtn.src = 'assets/Play.png';
+      progressBar.style.width = '100%';
+    });
+
+    // ------------------------------------------------------------
+    //  LISTEN BUTTON
+    // ------------------------------------------------------------
+    listenBtn.addEventListener('click', showControls);
+
+    // ------------------------------------------------------------
+    //  HOVER EFFECTS (dim the non‑hovered icon)
+    // ------------------------------------------------------------
+    const player = document.getElementById('audio-player');
+    const allControls = player.querySelectorAll('#play-btn, #volume-btn');
+
+    player.addEventListener('mouseenter', function (e) {
+      const target = e.target.closest('#play-btn, #volume-btn');
+      if (!target) return;
+      allControls.forEach(ctrl => {
+        if (ctrl !== target) ctrl.classList.add('dimmed');
+      });
+    });
+
+    player.addEventListener('mouseleave', function () {
+      allControls.forEach(ctrl => ctrl.classList.remove('dimmed'));
+    });
+
+    allControls.forEach(ctrl => {
+      ctrl.addEventListener('mouseover', function () {
+        allControls.forEach(c => {
+          if (c !== this) c.classList.add('dimmed');
+        });
+      });
+      ctrl.addEventListener('mouseout', function () {
+        allControls.forEach(c => c.classList.remove('dimmed'));
+      });
+    });
+
+    // ------------------------------------------------------------
+    //  INIT
+    // ------------------------------------------------------------
+    updateVolumeIcon();
+    console.log('✅ Desktop player ready. Audio: ' + AUDIO_FILE);
+  </script>
+</body>
+</html>
