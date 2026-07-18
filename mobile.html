@@ -124,13 +124,19 @@
     }
 
     /* --- Progress bar --- */
+    #progress-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
     #progress-container {
-      width: 100%;
+      flex: 1;
       height: 7px;
       background: rgba(255, 255, 255, 0.15);
       border-radius: 4px;
       overflow: hidden;
-      margin-top: 10px;
     }
 
     #progress-bar {
@@ -139,6 +145,16 @@
       background: #2eb912;
       border-radius: 2px;
       transition: width 0.3s linear;
+    }
+
+    #time-remaining {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.5);
+      font-family: 'Helvetica Neue', sans-serif;
+      font-variant-numeric: tabular-nums;
+      min-width: 50px;
+      text-align: right;
+      user-select: none;
     }
 
     /* --- RESPONSIVE (small tweaks) --- */
@@ -184,8 +200,11 @@
       <img id="play-btn" src="assets/Play.png" alt="Play" title="Play / Pause" />
       <img id="volume-btn" src="assets/Volume-high.png" alt="Volume" title="Volume: High" />
     </div>
-    <div id="progress-container">
-      <div id="progress-bar"></div>
+    <div id="progress-row">
+      <div id="progress-container">
+        <div id="progress-bar"></div>
+      </div>
+      <span id="time-remaining">−0:00</span>
     </div>
   </div>
 
@@ -237,13 +256,6 @@
     // ------------------------------------------------------------
     //  PROGRESS
     // ------------------------------------------------------------
-    function updateProgress() {
-      if (audio.duration) {
-        const pct = (audio.currentTime / audio.duration) * 100;
-        progressBar.style.width = pct + '%';
-      }
-    }
-
     // ------------------------------------------------------------
     //  SHOW CONTROLS (Listen button click)
     // ------------------------------------------------------------
@@ -293,9 +305,26 @@
     // ------------------------------------------------------------
     //  PROGRESS EVENTS
     // ------------------------------------------------------------
+    const timeRemaining = document.getElementById('time-remaining');
+
+    function formatTime(secs) {
+      const m = Math.floor(secs / 60);
+      const s = Math.floor(secs % 60);
+      return '−' + m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    function updateProgress() {
+      if (audio.duration) {
+        const pct = (audio.currentTime / audio.duration) * 100;
+        progressBar.style.width = pct + '%';
+        timeRemaining.textContent = formatTime(audio.duration - audio.currentTime);
+      }
+    }
+
     audio.addEventListener('timeupdate', updateProgress);
     audio.addEventListener('loadedmetadata', function () {
       progressBar.style.width = '0%';
+      timeRemaining.textContent = formatTime(audio.duration);
     });
     audio.addEventListener('ended', function () {
       isPlaying = false;
